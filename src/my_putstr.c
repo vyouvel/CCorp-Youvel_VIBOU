@@ -5,7 +5,7 @@
 ** my_putstr.c
 */
 
-#include "include/mycorp.h"
+#include "../include/mycorp.h"
 
 int my_putstr(char const *str)
 {

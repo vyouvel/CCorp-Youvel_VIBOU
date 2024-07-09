@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2024
-** Epitech SYN MyCORP
+** CCorp-Youvel_VIBOU
 ** File description:
-** Main du programme
+** main.c
 */
 
 #include "../include/mycorp.h"
@@ -48,167 +48,6 @@ bool is_a_alpha_char(char c)
     }
 }
 
-int count_words(char const *str)
-{
-    int i = 0;
-    int n = 0;
-
-    for (; str[i] != '\0'; i++) {
-        if (is_a_alpha_char(str[i]) == false && i != 0 && is_a_alpha_char(str[i - 1]) == true) {
-            n++;
-        }
-    }
-    if (is_a_alpha_char(str[i - 1]) == true) {
-        return (n + 1);
-    } else {
-        return n;
-    }
-}
-
-int word_length(char *str, int *z)
-{
-    int i;
-    int n = 0;
-
-    while (is_a_alpha_char(str[*z]) == false)
-        *z = *z + 1;
-    i = *z;
-    while (str[i] != '\0' && is_a_alpha_char(str[i]) == true) {
-        n++;
-        i++;
-    }
-    return n;
-}
-
-void put_word(char *line, int *z, char *buf)
-{
-    int i = 0;
-
-    while (buf[*z] != '\0') {
-        if (is_a_alpha_char(buf[*z]) == true) {
-            line[i] = buf[*z];
-            (*z)++;
-            i++;
-            continue;
-        }
-        if (is_a_alpha_char(buf[*z]) == false) {
-            line[i] = '\0';
-            (*z)++;
-            return;
-        }
-    }
-    line[i] = '\0';
-}
-
-char **str_to_word_array(char *str)
-{
-    int i;
-    int j = 0;
-    int z = 0;
-    int words = count_words(str);
-    char **tab = (char **)malloc(sizeof(char *) * (words + 1));
-
-    for (i = 0; i < words; i++) {
-        tab[i] = (char *)malloc(word_length(str, &z) + 1);
-        put_word(tab[i], &z, str);
-    }
-    tab[i] = NULL;
-    return tab;
-}
-
-bool is_good_file(file_t *mycorp, char *av)
-{
-    struct stat info;
-    int size;
-    int n = 0;
-
-    mycorp->fd = open(av, O_RDONLY);
-    if (mycorp->fd < 0)
-        return false;
-    n = stat(av, &info);
-    size = info.st_size;
-    mycorp->buffer = malloc(sizeof(char) * (size + 1));
-    read(mycorp->fd, mycorp->buffer, size);
-    mycorp->buffer[size] = '\0';
-    remove_comments(mycorp->buffer);
-    if (my_strlen(mycorp->buffer) == 0)
-        return false;
-    return true;
-}
-
-int number_of_valid_line(char *buffer)
-{
-    int i = 0;
-    int lines = 0;
-
-    for (i = 0; buffer[i] == '\n'; i++);
-    for (i; buffer[i] != 0; i++) {
-        if (buffer[i] == '\n' && buffer[i - 1] != '\n')
-            lines++;
-    }
-    if (buffer[my_strlen(buffer) - 1] != '\n')
-        lines++;
-    return lines;
-}
-
-int size_of_line(char *str)
-{
-    int size = 0;
-
-    for (int i = 0; str[i] != '\0' && str[i] != '\n'; i++) {
-        size++;
-    }
-    return size;
-}
-
-char **allocate_tab(char *buffer)
-{
-    int lines = number_of_valid_line(buffer);
-    char **tab = (char **)malloc(sizeof(char *) * (lines + 1));
-
-    return tab;
-}
-
-int fill_line(char *line, int index, char *buffer)
-{
-    int i = 0;
-
-    while (buffer[index] != '\0') {
-        if (buffer[index] != '\n') {
-            line[i] = buffer[index];
-            index++;
-            i++;
-            continue;
-        } else {
-            line[i] = '\0';
-            index++;
-            return index;
-        }
-    }
-    line[i] = '\0';
-    return index;
-}
-
-void get_content_in_tab(file_t *mycorp)
-{
-    int i;
-    int j = 0;
-    int index = 0;
-
-    mycorp->content_tab = allocate_tab(mycorp->buffer);
-    for (i = 0; i < number_of_valid_line(mycorp->buffer); i++) {
-        if (!size_of_line(mycorp->buffer + index)) {
-            i--;
-            index++;
-            continue;
-        }
-        mycorp->content_tab[i] = (char *)malloc(size_of_line(mycorp->buffer + index) + 1);
-        index = fill_line(mycorp->content_tab[i], index, mycorp->buffer);
-    }
-    mycorp->content_tab[i] = NULL;
-    mycorp->content_tab_size = i;
-    return;
-}
 
 int is_indirect(char *str)
 {
@@ -461,13 +300,13 @@ int is_redifine_name_comment(file_t *mycorp)
 {
     char **line_tab = NULL;
 
-    if (tab_length(mycorp->tab) < 2)
+    if (tab_length(mycorp->content_tab) < 2)
         return 84;
-    for (int i = 2; mycorp->tab[i] != NULL; i++) {
-        line_tab = str_to_word_array(mycorp->tab[i]);
+    for (int i = 2; mycorp->content_tab[i] != NULL; i++) {
+        line_tab = str_to_word_array(mycorp->content_tab[i]);
         if (!my_strcmp(line_tab[0], ".comment"))
             return 84;
-        if (!my_my_strcmp(line_tab[0], ".name"))
+        if (!my_strcmp(line_tab[0], ".name"))
             return 84;
     }
 }
@@ -517,7 +356,7 @@ int verify_header(file_t *mycorp)
         return 84;
     if (name_tab[tab_length(name_tab) - 1][my_strlen(name_tab[tab_length(name_tab) - 1]) - 1] != '"')
         return 84;
-    if (comment_tab[tab_length(comment_tab) - 1][my_my_strlen(comment_tab[tab_length(comment_tab) - 1]) - 1] != '"')
+    if (comment_tab[tab_length(comment_tab) - 1][my_strlen(comment_tab[tab_length(comment_tab) - 1]) - 1] != '"')
         return 84;
     if (error_case_name_comment(mycorp) == 84)
         return 84;

@@ -54,10 +54,14 @@ int is_redifine_name_comment(file_t *mycorp);
 int error_case_name_comment(file_t *mycorp);
 int verify_header(file_t *mycorp);
 int main(int ac, char **av);
+int my_strcmp(const char *y, const char *x);
+int my_strncmp(const char *y, const char *x, int n);
+int my_strlen(char const *str);
 
 char **str_to_word_array(char *str);
 char **allocate_tab(char *buffer);
 char *recup_name_comment(char *str);
+char *my_strdup(char const *src);
 
 parameter_t **get_parameter(char **tab, instruction_t *instruction);
 op_t get_op_code(char *op_co);
