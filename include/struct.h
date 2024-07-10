@@ -56,6 +56,7 @@ typedef struct instruction_s {
 
 typedef struct file_s {
     int fd;
+    int new_fd;
     char *buffer;
     char **content_tab;
     int content_tab_size;

@@ -362,27 +362,3 @@ int verify_header(file_t *mycorp)
         return 84;
     return 0;
 }
-
-int main(int ac, char **av)
-{
-    file_t mycorp;
-
-    if (ac == 2 && av[1][0] == '-' && av[1][1] == 'h') {
-        print_help();
-        return 0;
-    }
-    if (ac < 2) {
-        write(2, "Not enough parameters, check the usage with \'-h\'\n", 49);
-        return 84;
-    }
-    if (is_good_file(&mycorp, av[1]) == false) {
-        write(2, "Not a recognized file format\n", 29);
-        close(mycorp.fd);
-        if (mycorp.buffer != NULL)
-            free(mycorp.buffer);
-        return 84;
-    }
-    initialise_struct(&mycorp, av[1]);
-    if (verify_header(&mycorp) == 84)
-        return 84;
-}

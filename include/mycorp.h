@@ -36,6 +36,9 @@ void compute_size(file_t *mycorp);
 void check_label(file_t *mycorp, int i, int j);
 void get_labels(file_t *mycorp);
 void initialise_struct(file_t *mycorp, char *av);
+void copy_name(header_t *header, char *src, int max_size);
+void copy_cmt(struct header_s *header, char *src, int max_size);
+void write_header(file_t *mycorp, char *filename);
 
 int my_putstr(char const *str);
 int tab_length(char **tab);
@@ -53,15 +56,20 @@ int check_label_val(int n, int count, file_t *mycorp);
 int is_redifine_name_comment(file_t *mycorp);
 int error_case_name_comment(file_t *mycorp);
 int verify_header(file_t *mycorp);
-int main(int ac, char **av);
 int my_strcmp(const char *y, const char *x);
 int my_strncmp(const char *y, const char *x, int n);
 int my_strlen(char const *str);
+int convert_endian(int num);
+int get_prog_size(file_t *mycorp);
+int main(int ac, char **av);
+
 
 char **str_to_word_array(char *str);
 char **allocate_tab(char *buffer);
 char *recup_name_comment(char *str);
 char *my_strdup(char const *src);
+char *new_name(char *filename);
 
 parameter_t **get_parameter(char **tab, instruction_t *instruction);
 op_t get_op_code(char *op_co);
+
