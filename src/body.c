@@ -31,17 +31,6 @@ int decimal_convert(char *bin)
     return result;
 }
 
-
-short short_swap(short value)
-{
-    short left = value & 0xFF;
-    short right = (value >> 8) & 0xFF;
-    short result;
-
-    result = (left << 8) | right;
-    return result;
-}
-
 op_t get_op(char code)
 {
     int i = 0;
@@ -54,31 +43,20 @@ op_t get_op(char code)
     return op_tab[i];
 }
 
-void check_label(file_t *mycorp, int i, int j)
+short short_swap(short value)
 {
-    int n = i;
-    int count = 0;
+    short left = value & 0xFF;
+    short right = (value >> 8) & 0xFF;
+    short result;
 
-    if (mycorp->tab[i]->parameter[j]->label != NULL) {
-        count = get_label_number(mycorp->tab[i]->parameter[j]->label, mycorp);
-        mycorp->tab[i]->parameter[j]->value = check_label_val(n, count, mycorp);
-    }
+    result = (left << 8) | right;
+    return result;
 }
-
-void get_labels(file_t *mycorp)
-{
-    for (int i = 0; mycorp->tab[i] != NULL; i++) {
-        for (int j = 0; mycorp->tab[i]->parameter[j] != NULL; j++) {
-            check_label(mycorp, i, j);
-        }
-    }
-}
-
 
 int is_elsewhere(char *label, file_t *mycorp, int i)
 {
     for (int j = i + 1; mycorp->tab[j] != NULL; j++) {
-        if (mycorp->tab[j]->label && !my_strcmp(mycorp->tab[j]->label, label))
+        if (mycorp->tab[j]->label && !strcmp(mycorp->tab[j]->label, label))
             return 0;
     }
     return 1;
@@ -219,62 +197,4 @@ void write_instructions(file_t *mycorp)
         write(mycorp->new_fd, &(coding_byte), 1);
         write_other(mycorp->tab[i]->parameter, mycorp);
     }
-}
-
-void nextt(char *ptr)
-{
-    if (ptr != NULL)
-        free(ptr);
-}
-
-void free_file(file_t *mycorp)
-{
-    free(mycorp->buffer);
-    for (int i = 0; mycorp->tab[i] != NULL; i++) {
-        for (int j = 0; mycorp->tab[i]->parameter[j] != NULL; j++) {
-            nextt(mycorp->tab[i]->parameter[j]->label);
-            free(mycorp->tab[i]->parameter[j]);
-        }
-        free(mycorp->tab[i]->parameter);
-        nextt(mycorp->tab[i]->label);
-        free(mycorp->tab[i]);
-    }
-    for (int i = 0; mycorp->content_tab[i] != NULL; i++) {
-        free(mycorp->content_tab[i]);
-    }
-    free(mycorp->content_tab);
-    free(mycorp->tab);
-    close(mycorp->fd);
-    close(mycorp->new_fd);
-}
-
-int main(int ac, char **av)
-{
-    file_t mycorp;
-
-    if (ac == 2 && av[1][0] == '-' && av[1][1] == 'h') {
-        print_help();
-        return 0;
-    }
-    if (ac < 2) {
-        write(2, "Not enough parameters, check the usage with \'-h\'\n", 49);
-        return 84;
-    }
-    if (is_good_file(&mycorp, av[1]) == false) {
-        write(2, "Not a recognized file format\n", 29);
-        close(mycorp.fd);
-        if (mycorp.buffer != NULL)
-            free(mycorp.buffer);
-        return 84;
-    }
-    initialise_struct(&mycorp, av[1]);
-    if (verify_header(&mycorp) == 84)
-        return 84;
-    write_header(&mycorp, av[1]);
-    if (verify_label(&mycorp) == 84)
-        return 84;
-    if (verify_every_param(&mycorp) == 84)
-        return 84;
-    write_instructions(&mycorp);
-    free_file(&mycorp);
 }
