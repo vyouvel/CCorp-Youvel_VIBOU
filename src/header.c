@@ -1,28 +1,100 @@
 /*
 ** EPITECH PROJECT, 2024
-** Epitech SYN MyCORP
+** CCorp-Youvel_VIBOU
 ** File description:
-** Main du programme
+** header.c
 */
 
 #include "../include/mycorp.h"
 
-int convert_endian(int num)
+void initialise_struct(file_t *mycorp, char *av)
 {
-    byte_t bytes;
-    int result = 0;
+    char **tab = NULL;
+    int i = 0;
+    int j = 0;
 
-    bytes.leftmost = (num & 0x000000FF);
-    bytes.left_middle = (num & 0x0000FF00) >> 8;
-    bytes.right_middle = (num & 0x00FF0000) >> 16;
-    bytes.rightmost = (num & 0xFF000000) >> 24;
-    bytes.leftmost <<= 24;
-    bytes.left_middle <<= 16;
-    bytes.right_middle <<= 8;
-    bytes.rightmost <<= 0;
-    result = (bytes.leftmost | bytes.left_middle | bytes.right_middle
-    | bytes.rightmost);
-    return result;
+    get_content_in_tab(mycorp);
+    j = tab_length(mycorp->content_tab);
+    mycorp->tab = (instruction_t**)malloc(sizeof(instruction_t *) *
+    (j - 1));
+    for (i = 0; i < j - 2; i++) {
+        mycorp->tab[i] = (instruction_t *)malloc(sizeof(instruction_t));
+    }
+    mycorp->tab[i] = NULL;
+    for (int i = 0; mycorp->tab[i] != NULL; i++) {
+        tab = str_to_word_array(mycorp->content_tab[i + 2]);
+        initialise_instruction(mycorp->content_tab[i + 2], tab, mycorp->tab[i]);
+    }
+    get_index_pos(mycorp);
+    compute_size(mycorp);
+    get_labels(mycorp);
+}
+
+int is_redifine_name_comment(file_t *mycorp)
+{
+    char **line_tab = NULL;
+
+    if (tab_length(mycorp->content_tab) < 2)
+        return 84;
+    for (int i = 2; mycorp->content_tab[i] != NULL; i++) {
+        line_tab = str_to_word_array(mycorp->content_tab[i]);
+        if (!my_strcmp(line_tab[0], ".comment"))
+            return 84;
+        if (!my_strcmp(line_tab[0], ".name"))
+            return 84;
+    }
+}
+
+char *recup_name_comment(char *str)
+{
+    int i = 0;
+    int j = 0;
+    char *buffer = malloc(sizeof(char) * COMMENT_LENGTH);
+
+    while (str[i] != '"') {
+        i++;
+    }
+    i++;
+    while (str[i] != '"') {
+        buffer[j] = str[i];
+        j++;
+        i++;
+    }
+    buffer[j] = '\0';
+    return buffer;
+}
+
+int error_case_name_comment(file_t *mycorp)
+{
+    char *name = recup_name_comment(mycorp->content_tab[0]);
+    char *cmt = recup_name_comment(mycorp->content_tab[1]);
+
+    if (!my_strlen(name) || !my_strlen(cmt))
+        return 84;
+    if (my_strlen(name) > PROG_NAME_LENGTH || my_strlen(cmt) > COMMENT_LENGTH)
+        return 84;
+    if (is_redifine_name_comment(mycorp) == 84)
+        return 84;
+}
+
+int verify_header(file_t *mycorp)
+{
+    char **name_tab = str_to_word_array(mycorp->content_tab[0]);
+    char **comment_tab = str_to_word_array(mycorp->content_tab[1]);
+
+    if (tab_length(name_tab) < 2 || tab_length(comment_tab) < 2)
+        return 84;
+    if (my_strcmp(".comment", comment_tab[0]) || my_strcmp(".name", name_tab[0]))
+        return 84;
+    if (name_tab[1][0] != '"' || comment_tab[1][0] != '"')
+        return 84;
+    if (name_tab[tab_length(name_tab) - 1][my_strlen(name_tab[tab_length(name_tab) - 1]) - 1] != '"')
+        return 84;
+    if (comment_tab[tab_length(comment_tab) - 1][my_strlen(comment_tab[tab_length(comment_tab) - 1]) - 1] != '"')
+        return 84;
+    if (error_case_name_comment(mycorp) == 84)
+        return 84;
+    return 0;
 }
 
 char *new_name(char *filename)
@@ -92,8 +164,7 @@ void write_header(file_t *mycorp, char *filename)
     int size = get_prog_size(mycorp);
     int i = 0;
 
-    mycorp->new_fd = open(new, O_CREAT | O_RDONLY | O_WRONLY, S_IRWXG | S_IRWXO
-                    | S_IRWXU);
+    mycorp->new_fd = open(new, O_CREAT | O_RDONLY | O_WRONLY, S_IRWXG | S_IRWXO | S_IRWXU);
     header->magic = convert_endian(CORP_EXEC_MAGIC);
     while (name[i] != '\0') {
         header->prog_name[i] = name[i];

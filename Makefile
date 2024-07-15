@@ -9,13 +9,12 @@ SRC	=	src/my_putchar.c	\
 		src/my_putstr.c	\
 		src/my_strdup.c	\
 		src/my_strcmp.c	\
-		op.c	\
 		src/parsing.c	\
-		src/my_strlen.c	\
-		src/word.c	\
-		src/line.c	\
+		src/my_strlen.c		\
 		src/header.c	\
-		src/instruction.c
+		src/instruction.c	\
+		src/line.c	\
+		op.c	\
 
 OBJ	=	$(SRC:.c=.o)
 

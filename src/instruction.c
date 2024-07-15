@@ -22,7 +22,7 @@ int my_power(int nb, int p)
 int decimal_convert(char *bin)
 {
     int result = 0;
-    int pow = strlen(bin) - 1;
+    int pow = my_strlen(bin) - 1;
 
     for (int i = 0; bin[i] != '\0'; i++) {
         result += (bin[i] - 48) * (my_power(2, pow));
@@ -54,10 +54,31 @@ op_t get_op(char code)
     return op_tab[i];
 }
 
+void check_label(file_t *mycorp, int i, int j)
+{
+    int n = i;
+    int count = 0;
+
+    if (mycorp->tab[i]->parameter[j]->label != NULL) {
+        count = get_label_number(mycorp->tab[i]->parameter[j]->label, mycorp);
+        mycorp->tab[i]->parameter[j]->value = check_label_val(n, count, mycorp);
+    }
+}
+
+void get_labels(file_t *mycorp)
+{
+    for (int i = 0; mycorp->tab[i] != NULL; i++) {
+        for (int j = 0; mycorp->tab[i]->parameter[j] != NULL; j++) {
+            check_label(mycorp, i, j);
+        }
+    }
+}
+
+
 int is_elsewhere(char *label, file_t *mycorp, int i)
 {
     for (int j = i + 1; mycorp->tab[j] != NULL; j++) {
-        if (mycorp->tab[j]->label && !strcmp(mycorp->tab[j]->label, label))
+        if (mycorp->tab[j]->label && !my_strcmp(mycorp->tab[j]->label, label))
             return 0;
     }
     return 1;
