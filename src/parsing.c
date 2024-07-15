@@ -7,8 +7,6 @@
 
 #include "../include/mycorp.h"
 
-//fonctions non authorisées utilisées: my_strlen, atoi, my_strcmp, my_strdup... Y'en a plein donc faut voir dans le code
-
 void print_help(void)
 {
     write(1, "USAGE\n", 6);
@@ -47,7 +45,6 @@ bool is_a_alpha_char(char c)
         return false;
     }
 }
-
 
 int is_indirect(char *str)
 {
@@ -163,7 +160,8 @@ void get_index_pos(file_t *mycorp)
     for (int i = 0; mycorp->tab[i] != NULL; i++) {
         for (int j = 0; mycorp->tab[i]->parameter[j] != NULL; j++) {
             mycorp->tab[i]->parameter[j]->is_index = false;
-            verify_if_index(mycorp->tab[i]->parameter[j], mycorp->tab[i]->code, j);
+            verify_if_index(mycorp->tab[i]->parameter[j],
+                mycorp->tab[i]->code, j);
         }
     }
 }
@@ -210,7 +208,8 @@ void compute_size(file_t *mycorp)
 int get_label_number(char *name, file_t *mycorp)
 {
     for (int i = 0; mycorp->tab[i] != NULL; i++) {
-        if (mycorp->tab[i]->label && !strncmp(mycorp->tab[i]->label, name, my_strlen(name)))
+        if (mycorp->tab[i]->label && !my_strncmp(mycorp->tab[i]->label, name,
+            my_strlen(name)))
             return i;
     }
     return -1;
@@ -281,7 +280,7 @@ void initialise_struct(file_t *mycorp, char *av)
 
     get_content_in_tab(mycorp);
     j = tab_length(mycorp->content_tab);
-    mycorp->tab = (instruction_t**)malloc(sizeof(instruction_t *) *
+    mycorp->tab = (instruction_t **)malloc(sizeof(instruction_t *) *
     (j - 1));
     for (i = 0; i < j - 2; i++) {
         mycorp->tab[i] = (instruction_t *)malloc(sizeof(instruction_t));
@@ -289,7 +288,8 @@ void initialise_struct(file_t *mycorp, char *av)
     mycorp->tab[i] = NULL;
     for (int i = 0; mycorp->tab[i] != NULL; i++) {
         tab = str_to_word_array(mycorp->content_tab[i + 2]);
-        initialise_instruction(mycorp->content_tab[i + 2], tab, mycorp->tab[i]);
+        initialise_instruction(mycorp->content_tab[i + 2], tab,
+            mycorp->tab[i]);
     }
     get_index_pos(mycorp);
     compute_size(mycorp);
@@ -350,13 +350,16 @@ int verify_header(file_t *mycorp)
 
     if (tab_length(name_tab) < 2 || tab_length(comment_tab) < 2)
         return 84;
-    if (my_strcmp(".comment", comment_tab[0]) || my_strcmp(".name", name_tab[0]))
+    if (my_strcmp(".comment", comment_tab[0]) ||
+        my_strcmp(".name", name_tab[0]))
         return 84;
     if (name_tab[1][0] != '"' || comment_tab[1][0] != '"')
         return 84;
-    if (name_tab[tab_length(name_tab) - 1][my_strlen(name_tab[tab_length(name_tab) - 1]) - 1] != '"')
+    if (name_tab[tab_length(name_tab) - 1][my_strlen(name_tab
+        [tab_length(name_tab) - 1]) - 1] != '"')
         return 84;
-    if (comment_tab[tab_length(comment_tab) - 1][my_strlen(comment_tab[tab_length(comment_tab) - 1]) - 1] != '"')
+    if (comment_tab[tab_length(comment_tab) - 1]
+        [my_strlen(comment_tab[tab_length(comment_tab) - 1]) - 1] != '"')
         return 84;
     if (error_case_name_comment(mycorp) == 84)
         return 84;

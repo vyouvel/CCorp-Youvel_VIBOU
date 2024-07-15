@@ -13,7 +13,8 @@ int count_words(char const *str)
     int n = 0;
 
     for (; str[i] != '\0'; i++) {
-        if (is_a_alpha_char(str[i]) == false && i != 0 && is_a_alpha_char(str[i - 1]) == true) {
+        if (is_a_alpha_char(str[i]) == false && i != 0 &&
+        is_a_alpha_char(str[i - 1]) == true) {
             n++;
         }
     }

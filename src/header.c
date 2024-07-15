@@ -92,7 +92,8 @@ void write_header(file_t *mycorp, char *filename)
     int size = get_prog_size(mycorp);
     int i = 0;
 
-    mycorp->new_fd = open(new, O_CREAT | O_RDONLY | O_WRONLY, S_IRWXG | S_IRWXO | S_IRWXU);
+    mycorp->new_fd = open(new, O_CREAT | O_RDONLY | O_WRONLY, S_IRWXG | S_IRWXO
+                    | S_IRWXU);
     header->magic = convert_endian(CORP_EXEC_MAGIC);
     while (name[i] != '\0') {
         header->prog_name[i] = name[i];
@@ -113,29 +114,4 @@ void write_header(file_t *mycorp, char *filename)
     }
     header->prog_size = convert_endian(size);
     write(mycorp->new_fd, header, sizeof(struct header_s));
-}
-
-int main(int ac, char **av)
-{
-    file_t mycorp;
-
-    if (ac == 2 && av[1][0] == '-' && av[1][1] == 'h') {
-        print_help();
-        return 0;
-    }
-    if (ac < 2) {
-        write(2, "Not enough parameters, check the usage with \'-h\'\n", 49);
-        return 84;
-    }
-    if (is_good_file(&mycorp, av[1]) == false) {
-        write(2, "Not a recognized file format\n", 29);
-        close(mycorp.fd);
-        if (mycorp.buffer != NULL)
-            free(mycorp.buffer);
-        return 84;
-    }
-    initialise_struct(&mycorp, av[1]);
-    if (verify_header(&mycorp) == 84)
-        return 84;
-    write_header(&mycorp, av[1]);
 }

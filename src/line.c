@@ -73,7 +73,8 @@ void get_content_in_tab(file_t *mycorp)
             index++;
             continue;
         }
-        mycorp->content_tab[i] = (char *)malloc(size_of_line(mycorp->buffer + index) + 1);
+        mycorp->content_tab[i] = (char *)malloc(size_of_line(mycorp->buffer + index)
+            + 1);
         index = fill_line(mycorp->content_tab[i], index, mycorp->buffer);
     }
     mycorp->content_tab[i] = NULL;

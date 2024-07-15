@@ -14,7 +14,8 @@ SRC	=	src/my_putchar.c	\
 		src/my_strlen.c	\
 		src/word.c	\
 		src/line.c	\
-		src/header.c
+		src/header.c	\
+		src/instruction.c
 
 OBJ	=	$(SRC:.c=.o)
 

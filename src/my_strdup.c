@@ -19,7 +19,6 @@ char *my_strdup(char const *src)
         j++;
     }
     cpy[i] = '\0';
-
     return (cpy);
     free(cpy);
 }
